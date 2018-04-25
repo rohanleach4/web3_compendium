@@ -1,0 +1,97 @@
+<!doctype>
+<html>
+
+<head>
+    <script type="text/javascript" src="../dist/web3.js"></script>
+    <script type="text/javascript">
+        var Web3 = require('web3');
+        var web3 = new Web3();
+        web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
+
+        if (!web3.isConnected()) {
+            console.log('Oh dear. We seem not to be connecting to web3. Try using ganache-cli [npm install -g  ganache-cli and then run ganache-cli in the terminal/console');
+        } else {
+            console.log('Web3 is all tickey boo!');
+            operation();
+        }
+        
+        var value = web3.fromWei('21000000000000', 'ether');
+        console.log(value);
+
+        var sync = web3.eth.syncing;
+	console.log('======= syncing ========');
+        console.log(sync);
+
+        var accounts = web3.eth.accounts;
+	console.log('======= accounts ========');
+        console.table(accounts);
+
+	console.log('======= balance ========');
+        var balance = web3.eth.getBalance('0xEe69cFA05F8d7db1AEDb46ca7Bb80E546a9076e7');
+        console.log(balance); // BigNumber
+        console.log(balance.toString(10));
+        console.log(balance.toNumber());
+        
+        // Sending Ether to a different accounts
+        function operation() {
+            var coinbase = web3.eth.coinbase;
+            var mining = web3.eth.mining;
+            var gasPrice = web3.eth.gasPrice;
+            var accounts = web3.eth.accounts;
+            var accountBalancePre0 = web3.eth.getBalance(accounts[0]);
+            var accountBalancePre1 = web3.eth.getBalance(accounts[1]);
+            console.log('======= nice to know ========');
+            console.log('The coinbase (where the mining rewards go to): ' + coinbase);
+            console.log('The mining ' + mining);
+            console.log('The gas price: ' + gasPrice);
+
+            console.log('======= account before transfer ========');
+            console.log(accountBalancePre0.toNumber());
+            console.log(accountBalancePre1.toNumber());
+
+            var sender = web3.eth.accounts[0];
+            var receiver = web3.eth.accounts[1];
+            var amount = web3.toWei(0.01, 'ether');
+            web3.eth.sendTransaction({
+                from: sender,
+                to: receiver,
+                value: amount
+            });
+
+            var accountBalancePost0 = web3.eth.getBalance(accounts[0]);
+            var accountBalancePost1 = web3.eth.getBalance(accounts[1]);
+            var transaction = web3.eth.getTransaction(
+                web3.eth.getBlock('pending').transactions[0]
+            );
+            console.log('======= transaction details ========');
+            console.table(transaction);
+
+            console.log('======= account after transfer ========');
+            console.log(accountBalancePost0.toNumber());
+            console.log(accountBalancePost1.toNumber());
+
+            console.log('======= receipt ========');
+            var receipt = web3.eth.getTransactionReceipt(transaction.hash);
+            console.table(receipt);
+
+            console.log('======= blockHash ========');
+            var blockhash = web3.eth.getBlock(transaction.blockHash);
+            console.table(blockhash);
+
+            console.log('======= timestamp ========');
+            let timestamp = blockhash.timestamp;
+            let newDate = new Date();
+            newDate.setTime(timestamp*1000);
+            let dateString = newDate.toUTCString();
+            console.log(timestamp + " : " + dateString);
+        }
+
+    </script>
+</head>
+
+<body>
+    <p>Remember to look in the console for the outputs.</p>
+    <button onclick="operation()">click here to initiate another transaction</button>
+</body>
+
+</html>
