@@ -7,3 +7,4 @@ https://github.com/ethereum/web3.js
 and
 ### ganache-cli
 https://github.com/trufflesuite/ganache-cli/blob/master/README.md
+then make sure the path on line 5 of this file is correct.
